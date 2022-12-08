@@ -6,7 +6,7 @@ class StaticURLTests(TestCase):
     def setUp(self):
         self.guest_client = Client()
 
-    def test_author_and_tech(self):
+    def test_pages(self):
         urls = (
             '/about/author/',
             '/about/tech/',

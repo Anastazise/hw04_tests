@@ -29,7 +29,7 @@ class PostTests(TestCase):
         self.authorized_client.force_login(PostTests.auth_user)
         self.authorized_client_author.force_login(PostTests.author)
 
-    def test_pages_uses_correct_template(self):
+    def test_pages_correct_template(self):
         page_names_templates = {
             reverse('posts:index'): 'posts/index.html',
             reverse(
@@ -51,7 +51,7 @@ class PostTests(TestCase):
                 response = self.authorized_client_author.get(reverse_name)
                 self.assertTemplateUsed(response, template)
 
-    def test_home_page_show_correct_context(self):
+    def test_home_page_correct_context(self):
         response = self.authorized_client.get(reverse('posts:index'))
         post_text = response.context.get('page_obj')[0].text
         post_author = response.context.get('page_obj')[0].author.username
@@ -60,7 +60,7 @@ class PostTests(TestCase):
         self.assertEqual(post_author, 'TestAuthor')
         self.assertEqual(group_post, 'Тестовая группа')
 
-    def test_group_list_page_show_correct_context(self):
+    def test_group_list_page_correct_context(self):
         url = reverse(
             'posts:group_list', kwargs={'slug': self.group.slug}
         )
@@ -72,7 +72,7 @@ class PostTests(TestCase):
         self.assertEqual(group_description, 'Тестовое описание')
         self.assertEqual(group_slug, 'test_slug')
 
-    def test_profile_page_show_correct_context(self):
+    def test_profile_page_correct_context(self):
         url = reverse('posts:profile', kwargs={'username': PostTests.author})
         response = self.authorized_client_author.get(url)
         post_text = response.context.get('page_obj')[0].text
@@ -82,7 +82,7 @@ class PostTests(TestCase):
         self.assertEqual(post_author, 'TestAuthor')
         self.assertEqual(group_post, 'Тестовая группа')
 
-    def test_post_detail_pages_show_correct_context(self):
+    def test_post_detail_pages_correct_context(self):
         url = reverse('posts:post_detail', kwargs={'post_id': self.post.pk})
         response = self.authorized_client_author.get(url)
         post_text = response.context.get('post').text
@@ -92,7 +92,7 @@ class PostTests(TestCase):
         self.assertEqual(post_author, 'TestAuthor')
         self.assertEqual(group_post, 'Тестовая группа')
 
-    def test_create_post_edit_show_correct_context(self):
+    def test_create_post_edit_correct_context(self):
         url = reverse('posts:post_edit', kwargs={'post_id': self.post.pk})
         response = self.authorized_client_author.get(url)
         form_fields = {
@@ -104,7 +104,7 @@ class PostTests(TestCase):
                 form_field = response.context.get('form').fields.get(field)
                 self.assertIsInstance(form_field, expected)
 
-    def test_create_post_show_correct_context(self):
+    def test_create_post_correct_context(self):
         url = reverse('posts:post_create')
         response = self.authorized_client.get(url)
         form_fields = {
@@ -116,7 +116,7 @@ class PostTests(TestCase):
                 form_field = response.context.get('form').fields.get(field)
                 self.assertIsInstance(form_field, expected)
 
-    def test_create_post_show_home_group_list_profile_pages(self):
+    def test_create_post_home_group_list_profile_pages(self):
         urls = (
             reverse('posts:index'),
             reverse('posts:group_list', kwargs={'slug': self.group.slug}),
@@ -161,7 +161,7 @@ class PaginatorViewsTest(TestCase):
         ]
         Post.objects.bulk_create(cls.posts)
 
-    def test_first_page_contains_ten_records(self):
+    def test_first_page_is_ten_records(self):
         urls = (
             reverse('posts:index'),
             reverse('posts:group_list', kwargs={'slug': self.group.slug}),
@@ -174,7 +174,7 @@ class PaginatorViewsTest(TestCase):
             amount_posts = len(response.context.get('page_obj').object_list)
             self.assertEqual(amount_posts, 10)
 
-    def test_second_page_contains_three_records(self):
+    def test_second_page_is_three_records(self):
         urls = (
             reverse('posts:index') + '?page=2',
             reverse(

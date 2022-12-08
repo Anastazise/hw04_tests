@@ -62,6 +62,11 @@ class PostURLTests(TestCase):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
 
+    def test_create_url_redirect_anonymous_on_admin_login(self):
+        response = self.guest_client.get('/create/', follow=True)
+        self.assertRedirects(
+            response, '/auth/login/?next=/create/')
+
     def test_url_exists_at_desired_location_for_auth_user(self):
         response = self.authorized_client.get('/create/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -71,11 +76,6 @@ class PostURLTests(TestCase):
             f'/posts/{self.post.pk}/edit/'
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_create_url_redirect_anonymous_on_admin_login(self):
-        response = self.guest_client.get('/create/', follow=True)
-        self.assertRedirects(
-            response, '/auth/login/?next=/create/')
 
     def test_task_detail_url_redirect_anonymous_on_admin_login(self):
         response = self.client.get(
