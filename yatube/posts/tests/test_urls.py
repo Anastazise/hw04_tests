@@ -48,6 +48,19 @@ class PostURLTests(TestCase):
             with self.subTest():
                 response = self.guest_client.get(address)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
+    
+    def test_urls_uses_correct_template(self):
+        templates_url_names = {
+            'posts/index.html': '/',
+            'posts/group_list.html': '/group/test_slug/',
+            'posts/profile.html': '/profile/TestAuthor/',
+            'posts/post_detail.html': f'/posts/{self.post.pk}/',
+            'posts/create_post.html': '/create/',
+        }
+        for template, address in templates_url_names.items():
+            with self.subTest(address=address):
+                response = self.authorized_client.get(address)
+                self.assertTemplateUsed(response, template)
 
     def test_url_exists_at_desired_location_for_auth_user(self):
         response = self.authorized_client.get('/create/')
@@ -71,16 +84,3 @@ class PostURLTests(TestCase):
         self.assertRedirects(
             response, (f'/auth/login/?next=/posts/{self.post.pk}/edit/')
         )
-
-    def test_urls_uses_correct_template(self):
-        templates_url_names = {
-            'posts/index.html': '/',
-            'posts/group_list.html': '/group/test_slug/',
-            'posts/profile.html': '/profile/TestAuthor/',
-            'posts/post_detail.html': f'/posts/{self.post.pk}/',
-            'posts/create_post.html': '/create/',
-        }
-        for template, address in templates_url_names.items():
-            with self.subTest(address=address):
-                response = self.authorized_client.get(address)
-                self.assertTemplateUsed(response, template)
