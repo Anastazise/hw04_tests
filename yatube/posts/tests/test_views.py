@@ -116,17 +116,6 @@ class PostTests(TestCase):
                 form_field = response.context.get('form').fields.get(field)
                 self.assertIsInstance(form_field, expected)
 
-    def test_posts_group_page_not_include_incorect_post(self):
-
-        response = self.client.get(
-            reverse(
-                "posts:group_list",
-                kwargs={"slug": self.group_second_slug_value},
-            )
-        )
-        for secong_group_post in response.context["page_obj"]:
-            self.assertNotEqual(secong_group_post.pk, self.post[0].pk)
-
     def test_create_post_display(self):
         urls = (
             reverse('posts:index'),
