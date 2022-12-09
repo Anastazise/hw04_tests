@@ -115,7 +115,7 @@ class PostTests(TestCase):
             with self.subTest(field=field):
                 form_field = response.context.get('form').fields.get(field)
                 self.assertIsInstance(form_field, expected)
-    
+
     def test_posts_group_page_not_include_incorect_post(self):
 
         response = self.client.get(
