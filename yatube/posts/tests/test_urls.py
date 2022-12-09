@@ -29,7 +29,7 @@ class PostURLTests(TestCase):
         self.authorized_client.force_login(PostURLTests.auth_user)
         self.authorized_client_author.force_login(PostURLTests.author)
 
-    def test_homepage(self):
+    def test_mainpage(self):
         response = self.guest_client.get('/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
@@ -37,7 +37,7 @@ class PostURLTests(TestCase):
         response = self.guest_client.get('/page_404/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
-    def test_url_exists_at_desired_location_for_anonymous(self):
+    def test_pages_available_to_unauth_user(self):
         url_names = (
             '/',
             '/group/test_slug/',
@@ -48,7 +48,7 @@ class PostURLTests(TestCase):
             with self.subTest():
                 response = self.guest_client.get(address)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
-    
+
     def test_urls_uses_correct_template(self):
         templates_url_names = {
             'posts/index.html': '/',
@@ -62,7 +62,7 @@ class PostURLTests(TestCase):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
 
-    def test_create_url_redirect_anonymous_on_admin_login(self):
+    def test_create_url_redirect_unauth_user_to_admin_login(self):
         response = self.guest_client.get('/create/', follow=True)
         self.assertRedirects(
             response, '/auth/login/?next=/create/')
@@ -71,13 +71,7 @@ class PostURLTests(TestCase):
         response = self.authorized_client.get('/create/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_url_exists_at_desired_location_for_author(self):
-        response = self.authorized_client_author.get(
-            f'/posts/{self.post.pk}/edit/'
-        )
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_task_detail_url_redirect_anonymous_on_admin_login(self):
+    def test_task_detail_url_redirect_unauth_user_on_login(self):
         response = self.client.get(
             f'/posts/{self.post.pk}/edit/', follow=True
         )

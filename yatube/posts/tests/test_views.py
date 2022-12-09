@@ -29,7 +29,7 @@ class PostTests(TestCase):
         self.authorized_client.force_login(PostTests.auth_user)
         self.authorized_client_author.force_login(PostTests.author)
 
-    def test_pages_correct_template(self):
+    def test_correct_template(self):
         page_names_templates = {
             reverse('posts:index'): 'posts/index.html',
             reverse(
@@ -51,7 +51,7 @@ class PostTests(TestCase):
                 response = self.authorized_client_author.get(reverse_name)
                 self.assertTemplateUsed(response, template)
 
-    def test_home_page_correct_context(self):
+    def test_mainpage_correct_context(self):
         response = self.authorized_client.get(reverse('posts:index'))
         post_text = response.context.get('page_obj')[0].text
         post_author = response.context.get('page_obj')[0].author.username
@@ -115,8 +115,19 @@ class PostTests(TestCase):
             with self.subTest(field=field):
                 form_field = response.context.get('form').fields.get(field)
                 self.assertIsInstance(form_field, expected)
+    
+    def test_posts_group_page_not_include_incorect_post(self):
 
-    def test_create_post_home_group_list_profile_pages(self):
+        response = self.client.get(
+            reverse(
+                "posts:group_list",
+                kwargs={"slug": self.group_second_slug_value},
+            )
+        )
+        for secong_group_post in response.context["page_obj"]:
+            self.assertNotEqual(secong_group_post.pk, self.post[0].pk)
+
+    def test_create_post_display(self):
         urls = (
             reverse('posts:index'),
             reverse('posts:group_list', kwargs={'slug': self.group.slug}),
@@ -128,7 +139,7 @@ class PostTests(TestCase):
             response = self.authorized_client_author.get(url)
             self.assertEqual(len(response.context['page_obj'].object_list), 1)
 
-    def test_post_not_another_group(self):
+    def test_post_in_right_group(self):
         another_group = Group.objects.create(
             title='Дополнительная тестовая группа',
             slug='test-another-slug',
@@ -138,53 +149,3 @@ class PostTests(TestCase):
             reverse('posts:group_list', kwargs={'slug': another_group.slug})
         )
         self.assertEqual(len(response.context['page_obj']), 0)
-
-
-class PaginatorViewsTest(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.author = User.objects.create_user(username='TestAuthor')
-        cls.auth_user = User.objects.create_user(username='TestAuthUser')
-        cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='test_slug',
-            description='Тестовое описание',
-        )
-        cls.posts = [
-            Post(
-                author=cls.author,
-                text=f'Тестовый пост {i}',
-                group=cls.group,
-            )
-            for i in range(13)
-        ]
-        Post.objects.bulk_create(cls.posts)
-
-    def test_first_page_is_ten_records(self):
-        urls = (
-            reverse('posts:index'),
-            reverse('posts:group_list', kwargs={'slug': self.group.slug}),
-            reverse(
-                'posts:profile', kwargs={'username': self.author.username}
-            ),
-        )
-        for url in urls:
-            response = self.client.get(url)
-            amount_posts = len(response.context.get('page_obj').object_list)
-            self.assertEqual(amount_posts, 10)
-
-    def test_second_page_is_three_records(self):
-        urls = (
-            reverse('posts:index') + '?page=2',
-            reverse(
-                'posts:group_list', kwargs={'slug': self.group.slug}
-            ) + '?page=2',
-            reverse(
-                'posts:profile', kwargs={'username': self.author.username}
-            ) + '?page=2',
-        )
-        for url in urls:
-            response = self.client.get(url)
-            amount_posts = len(response.context.get('page_obj').object_list)
-            self.assertEqual(amount_posts, 3)

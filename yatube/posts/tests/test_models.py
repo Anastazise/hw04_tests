@@ -21,7 +21,6 @@ class PostModelTest(TestCase):
             text='Тестовый пост',
         )
 
-
     def test_models_have_correct_object_names(self):
         post = PostModelTest.post
         expected_object_name = post.text[:15]

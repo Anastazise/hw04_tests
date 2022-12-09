@@ -32,5 +32,6 @@ class Group(models.Model):
                             verbose_name='URL')
     description = models.TextField(max_length=500,
                                    verbose_name='Описание сообщества')
+
     def __str__(self) -> str:
         return self.title
