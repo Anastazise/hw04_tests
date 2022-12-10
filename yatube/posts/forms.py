@@ -1,6 +1,6 @@
 from django import forms
 from .models import Post
-from django.conf import MIN_POST_LEN
+from yatube.settings import MIN_POST_LEN
 
 
 class PostForm(forms.ModelForm):
