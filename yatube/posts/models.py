@@ -26,8 +26,7 @@ class Post(models.Model):
 
 
 class Group(models.Model):
-    title = models.CharField(max_length=200,
-                             verbose_name='Название группы')
+    title = models.CharField("Название группы", max_length=200)
     slug = models.SlugField(max_length=50, unique=True,
                             verbose_name='URL')
     description = models.TextField(max_length=500,
